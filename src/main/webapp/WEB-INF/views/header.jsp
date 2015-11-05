@@ -11,9 +11,9 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       
       <ul class="nav navbar-nav">
-                <li ><a href="${pageContext.request.contextPath}/problem">我的好友</a></li>
-                <li><a href="${pageContext.request.contextPath}/submission">大气查询</a></li>
-                <li><a href="${pageContext.request.contextPath}/contests">注册</a></li>
+                <li ><a href="${pageContext.request.contextPath}/friend">我的好友</a></li>
+                <li><a href="${pageContext.request.contextPath}/weather">大气查询</a></li>
+                <li><a href="${pageContext.request.contextPath}/register">注册</a></li>
                 <li><a href="${pageContext.request.contextPath}/msgbox">留言讨论</a></li>
                <li><a href= "${pageContext.request.contextPath}/about">关于</a></li>
       </ul>

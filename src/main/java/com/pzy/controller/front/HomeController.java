@@ -102,6 +102,7 @@ public class HomeController {
 		map.put("sd", sd);
 		map.put("aqi", aqi);
 		map.put("pm25", pm25);
+		map.put("weathers", weathers);
 		return map;
 	}
 	/***
@@ -169,7 +170,7 @@ public class HomeController {
 			return "login";
 		}else{
 			httpSession.setAttribute("user", user);
-			return "problem";
+			return "index";
 		}
 	}
 	/***

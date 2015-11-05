@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 /***
  *
  */
@@ -21,6 +23,7 @@ public class Weather implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date nowDate;
 	@ManyToOne(fetch = FetchType.EAGER)
 	private City city;

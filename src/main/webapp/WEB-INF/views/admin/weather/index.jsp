@@ -42,7 +42,7 @@
 								<h3>大气管理</h3>
 							</div>
 							<div class="box well form-inline">
-								<span>内容：</span>
+								<span>城市：</span>
 								<input type="text" id="_name" >
 								<a onclick="$.adminWeather.initSearchDataTable()"
 									class="btn btn-info" data-loading-text="正在加载..."><i class="icon-search"></i>查询</a>
@@ -107,12 +107,19 @@
 									<select name='type'>
 											<option value="晴">晴</option>
 											<option value="多云">多云</option>
+											<option value="阴">阴</option>
+											<option value="小雨">小雨</option>
+											<option value="中雨">中雨</option>
+											<option value="大雨">大雨</option>
+												<option value="小雪">小雪</option>
+													<option value="中雪">中雪</option>
+														<option value="大雪">大雪</option>
 									</select>
 								</div>
 							</div>
 							
 							<div class="control-group">
-								<label for="title" class="control-label">天气：</label>
+								<label for="title" class="control-label">所属日期：</label>
 								<div class="controls">
 									<div class="input-append date">
 											 <input  id="nowDate" name="nowDate" type="text" readonly="readonly" >

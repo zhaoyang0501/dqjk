@@ -71,10 +71,27 @@ jQuery.adminWeather = {
 					}],
 					"aoColumnDefs" : [
 						{
+							'aTargets' : [4],
+							'fnRender' : function(oObj, sVal) {
+								return sVal+"℃";
+							}
+						},
+						{
+							'aTargets' : [5],
+							'fnRender' : function(oObj, sVal) {
+								return sVal+"℃";
+							}
+						},
+						{
+							'aTargets' : [8],
+							'fnRender' : function(oObj, sVal) {
+								return sVal+"%";
+							}
+						},
+						{
 							'aTargets' : [9],
 							'fnRender' : function(oObj, sVal) {
-								return"  <button class=\"btn2 btn-info\" onclick=\"$.adminWeather.deleteWeather("+oObj.aData.id+")\"><i class=\"icon-trash\"></i> 删除</button>" +
-								" <button class=\"btn2 btn-info\" onclick=\"$.adminWeather.showEdit("+oObj.aData.id+")\"><i class=\"icon-pencil\"></i>修改</button>";
+								return"  <button class=\"btn2 btn-info\" onclick=\"$.adminWeather.deleteWeather("+oObj.aData.id+")\"><i class=\"icon-trash\"></i> 删除</button>";
 					
 							}
 						},
@@ -118,7 +135,30 @@ jQuery.adminWeather = {
 	            }
 	        });
 		},
-		
+		showEdit: function (id){
+			$("#id").val(id);
+			$.ajax({
+    			type : "get",
+    			url : $.ace.getContextPath() + "/admin/weather/get/"+id,
+    			dataType : "json",
+    			success : function(json) {
+    				if(json.state=='success'){
+    					$("#name").val(json.object.name);
+    					$("#username").val(json.object.username);
+    					$("#password").val(json.object.password);
+    					$("#tel").val(json.object.tel);
+    					$("#email").val(json.object.email);
+    					$("#address").val(json.object.address);
+    					$("#level").val(json.object.level);
+    					$("#manger").val(json.object.manger);
+    					$("#yyzh").val(json.object.yyzh);
+    				}else{
+    					noty({"text":""+ json.msg +"","layout":"top","type":"warning"});
+    				}
+    			}
+    		});
+			$("#_modal").modal('show');
+		},
 		saveWeather: function(id){
 			$.ajax({
     			type : "post",

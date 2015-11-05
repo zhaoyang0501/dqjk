@@ -41,8 +41,36 @@
 		<![endif]-->
 <script type="text/javascript">
 $.ace.setContextPath('${pageContext.request.contextPath}');
+	function fun_maptype(type){
+		if(type=="晴"){
+		return "d00.gif";
+		}
+		if(type=="多云"){
+		return "d01.gif";
+		}
+		if(type=="阴"){
+			return "d02.gif";
+		}
+		if(type=="小雨"){
+			return "d03.gif";
+		}
+		if(type=="中雨"){
+			return "d04.gif";
+		}
+		if(type=="大雨"){
+			return "d05.gif";
+		}
+		if(type=="小雪"){
+			return "d14.gif";
+		}
+		if(type=="中雪"){
+			return "d15.gif";
+		}
+		if(type=="大雪"){
+			return "d16.gif";
+		}
+	}
 	function fun_query(){
-		alert("ff");
 		$.ajax({
 			type : "POST",
 			url : $.ace.getContextPath() + "/weather",
@@ -52,9 +80,68 @@ $.ace.setContextPath('${pageContext.request.contextPath}');
 				"end":$("#end").val()
 			},
 			success : function(json) {
+				$("#table").html("");
+				for(i=0;i<json.weathers.length;i++){
+					$("#table").append("<tr>"+
+				 			"<td>"+json.weathers[i].nowDate+"</td>"+
+			 				"<td>"+json.weathers[i].type+"</td>"+
+			 				"	<td> "+json.weathers[i].temmin+"℃/"+json.weathers[i].temmax+"℃</td>"+
+			 				"	<td><img src='http://www.15tianqi.com/Images/weather/"+fun_maptype(json.weathers[i].type)+"' width='48' height='48'> </td>"+
+			 		"</tr>");
+				}
 				 var tmp_chart = echarts.init(document.getElementById('tmp_chart')); 
 				 var aqi_chart = echarts.init(document.getElementById('aqi_chart')); 
 				 var sd_chart = echarts.init(document.getElementById('sd_chart')); 
+				 var pm_chart = echarts.init(document.getElementById('pm_chart')); 
+				 pm_option = {
+			        	    title : {
+			        	        text: 'pm25',
+			        	    },
+			        	    tooltip : {
+			        	        trigger: 'axis'
+			        	    },
+			        	    legend: {
+			        	        data:['pm25']
+			        	    },
+			        	    toolbox: {
+			        	        show : true,
+			        	        feature : {
+			        	            mark : {show: true},
+			        	            dataView : {show: true, readOnly: false},
+			        	            magicType : {show: true, type: ['line', 'bar']},
+			        	            restore : {show: true},
+			        	            saveAsImage : {show: true}
+			        	        }
+			        	    },
+			        	    calculable : true,
+			        	    xAxis : [
+			        	        {
+			        	            type : 'category',
+			        	            boundaryGap : false,
+			        	            data : json.dates
+			        	        }
+			        	    ],
+			        	    yAxis : [
+			        	        {
+			        	            type : 'value',
+			        	            axisLabel : {
+			        	                formatter: '{value}'
+			        	            }
+			        	        }
+			        	    ],
+			        	    series : [
+			        	              {
+			        	                  name:'pm25',
+			        	                  type:'line',
+			        	                  data:json.pm25,
+			        	                  markLine : {
+			        	                	  data : [
+			        	                              [{name: '正常',value: "警戒", xAxis: -1, yAxis: 100},{xAxis:json.dates.length,yAxis: 100}]
+			        	                 ]
+			        	                  }
+			        	              }
+			        	          ]
+			        	      };
 				 sd_option = {
 			        	    title : {
 			        	        text: '空气湿度',
@@ -98,8 +185,7 @@ $.ace.setContextPath('${pageContext.request.contextPath}');
 			        	                  data:json.sd,
 			        	                  markLine : {
 			        	                	  data : [
-			        	                              [{name: '正常',value: 2, xAxis: -1, yAxis: 100},{xAxis:json.dates.length,yAxis: 100}],
-			        	                              [{name: '上年高限',value:3, xAxis: -1, yAxis: 2},{xAxis:json.dates.length,yAxis: 3}]
+			        	                              [{name: '正常',value: 50, xAxis: -1, yAxis: 50},{xAxis:json.dates.length,yAxis: 50}]
 			        	                 ]
 			        	                  }
 			        	              }
@@ -148,8 +234,7 @@ $.ace.setContextPath('${pageContext.request.contextPath}');
 			        	                  data:json.aqi,
 			        	                  markLine : {
 			        	                	  data : [
-			        	                              [{name: '正常',value: 2, xAxis: -1, yAxis: 100},{xAxis:json.dates.length,yAxis: 100}],
-			        	                              [{name: '上年高限',value:3, xAxis: -1, yAxis: 2},{xAxis:json.dates.length,yAxis: 3}]
+			        	                              [{name: '警戒值',value: "警戒值", xAxis: -1, yAxis: 100},{xAxis:json.dates.length,yAxis: 100}]
 			        	                 ]
 			        	                  }
 			        	              }
@@ -218,6 +303,7 @@ $.ace.setContextPath('${pageContext.request.contextPath}');
 			        tmp_chart.setOption(tmp_option); 
 			        aqi_chart.setOption(aqi_option); 
 			        sd_chart.setOption(sd_option); 
+			        pm_chart.setOption(pm_option); 
 			}
 		});
 		
@@ -225,10 +311,12 @@ $.ace.setContextPath('${pageContext.request.contextPath}');
 
 	$(document).ready(function(){
 		$('.input-daterange').datepicker({
+			 format: 'yyyy-mm-dd'
 		});
 		$('#myTabs a').click(function (e) {
 			  e.preventDefault()
-			  $(this).tab('show')
+			  $(this).tab('show');
+			  fun_query();
 		});
 		
 		  // 基于准备好的dom，初始化echarts图表
@@ -291,11 +379,12 @@ $.ace.setContextPath('${pageContext.request.contextPath}');
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="weather">
-     
+					     <table class="table" id="table">
+					 			</table>
     </div>
     <div role="tabpanel" class="tab-pane" id="tmp"><div id="tmp_chart" style="height:400px"></div></div>
     <div role="tabpanel" class="tab-pane" id="aqi"><div id="aqi_chart" style="height:400px"></div></div>
-    <div role="tabpanel" class="tab-pane" id="pm25">...</div>
+    <div role="tabpanel" class="tab-pane" id="pm25"><div id="pm_chart" style="height:400px"></div></div>
     <div role="tabpanel" class="tab-pane" id="sd"><div id="sd_chart" style="height:400px"></div></div>
   </div>
 
