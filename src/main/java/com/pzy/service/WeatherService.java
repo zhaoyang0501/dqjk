@@ -27,10 +27,26 @@ public class WeatherService {
 	public List<Weather> findAll() {
 		return (List<Weather>) weatherRepository.findAll();
 	}
-
+	public List<Weather> findAll(final Date start,final Date end,final Integer cityid) {
+		Specification<Weather> spec = new Specification<Weather>() {
+			public Predicate toPredicate(Root<Weather> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+				Predicate predicate = cb.conjunction();
+				if (start != null) {
+					predicate.getExpressions().add(cb.greaterThanOrEqualTo(root.get("nowDate").as(Date.class), start));
+				}
+				if (end != null) {
+					predicate.getExpressions().add(cb.lessThanOrEqualTo(root.get("nowDate").as(Date.class), end));
+				}
+				if (cityid != null) {
+					predicate.getExpressions().add(cb.equal(root.get("city").get("id").as(Integer.class), cityid));
+				}
+				return predicate;
+			}
+		};
+		return  weatherRepository.findAll(spec,new Sort(Direction.DESC, "nowDate"));
+	}
 	public Page<Weather> findAll(final int pageNumber, final int pageSize, final String name) {
 		PageRequest pageRequest = new PageRequest(pageNumber - 1, pageSize, new Sort(Direction.DESC, "id"));
-
 		Specification<Weather> spec = new Specification<Weather>() {
 			public Predicate toPredicate(Root<Weather> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 				Predicate predicate = cb.conjunction();

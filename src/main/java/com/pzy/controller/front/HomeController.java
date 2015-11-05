@@ -1,22 +1,33 @@
 package com.pzy.controller.front;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pzy.entity.MsgBoard;
 import com.pzy.entity.Notice;
 import com.pzy.entity.User;
+import com.pzy.entity.Weather;
+import com.pzy.service.CityService;
 import com.pzy.service.MsgBoardService;
 import com.pzy.service.NoticeService;
 import com.pzy.service.UserService;
+import com.pzy.service.WeatherService;
 /***
  * @author 263608237@qq.com
  *
@@ -31,14 +42,67 @@ public class HomeController {
 	private NoticeService noticeService;
 	@Autowired
 	private MsgBoardService msgBoardService;
-	
+	@Autowired
+	private CityService cityService;
+	@Autowired
+	private WeatherService weatherService;
 	@RequestMapping("index")
 	public String index() {
 		return "index";
 	}
+	/***
+	 * 关于
+	 * @return
+	 */
 	@RequestMapping("about")
 	public String about() {
 		return "about";
+	}
+	/***
+	 * 大气查询
+	 * @return
+	 */
+	@RequestMapping(value = "weather" ,method = RequestMethod.GET)
+	public String weather(Model model) {
+		model.addAttribute("citys", cityService.findAll());
+		return "weather";
+	}
+	/***
+	 * 大气查询
+	 * @return
+	 * @throws ParseException 
+	 */
+	
+	@RequestMapping(value = "weather" ,method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> weather(Integer cityid,String start,String end, Model model) throws ParseException {
+		Date b=StringUtils.isBlank(start)?null:DateUtils.parseDate(start, "yyyy-MM-dd");
+		Date e=StringUtils.isBlank(end)?null:DateUtils.parseDate(end, "yyyy-MM-dd");
+		List<Weather> weathers=weatherService.findAll(b, e, cityid);
+		List<String> dates=new ArrayList<String>();
+		List<Double> tmpmax=new ArrayList<Double>();
+		List<Double> tmpmin=new ArrayList<Double>();
+		List<Double> aqi=new ArrayList<Double>();
+		List<Double> pm25=new ArrayList<Double>();
+		List<Double> sd=new ArrayList<Double>();
+		
+		for(Weather bean:weathers){
+			dates.add(DateFormatUtils.format(bean.getNowDate(), "yyyy-MM-dd"));
+			tmpmax.add(bean.getTemmax());
+			tmpmin.add(bean.getTemmin());
+			aqi.add(bean.getAqi());
+			pm25.add(bean.getAqi());
+			sd.add(bean.getSd());
+		}
+		
+		Map<String,Object> map=new HashMap<String,Object>();
+		map.put("dates", dates);
+		map.put("tmpmax", tmpmax);
+		map.put("tmpmin", tmpmin);
+		map.put("sd", sd);
+		map.put("aqi", aqi);
+		map.put("pm25", pm25);
+		return map;
 	}
 	/***
 	 * 查看留言板
@@ -117,7 +181,7 @@ public class HomeController {
 	@RequestMapping(value = "loginout",method = RequestMethod.GET)
 	public String loginout(HttpSession httpSession, Model model) {
 		httpSession.removeAttribute("user");
-		return "problem";
+		return "index";
 	}
 	
 	@ModelAttribute
