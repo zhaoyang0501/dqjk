@@ -3,6 +3,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.pzy.entity.Weather;
 import com.pzy.service.CityService;
 import com.pzy.service.WeatherService;
+import com.pzy.utils.NetUtil;
 
 
 /***
@@ -90,6 +92,24 @@ public class WeatherController {
 			weatherService.delete(id);
 			map.put("state", "success");
 			map.put("msg", "删除成功");
+		} catch (Exception e) {
+			map.put("state", "error");
+			map.put("msg", "删除失败，外键约束");
+		}
+        return map;
+	}
+	@RequestMapping(value = "/updateall")
+	@ResponseBody
+	public Map<String, Object> updateall() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			List<Weather> list=weatherService.findAll();
+			NetUtil.getPm25(list);
+			for(Weather bean:list){
+				weatherService.save(bean);
+			}
+			map.put("state", "success");
+			map.put("msg", "接口中更新数据成功！！");
 		} catch (Exception e) {
 			map.put("state", "error");
 			map.put("msg", "删除失败，外键约束");

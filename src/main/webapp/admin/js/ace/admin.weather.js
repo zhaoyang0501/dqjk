@@ -116,6 +116,25 @@ jQuery.adminWeather = {
 			$("#_modal").modal('show');
 		},
 		
+		updateall :function(id){
+			bootbox.confirm( "是否确认更新全部？", function (result) {
+	            if(result){
+	            	$.ajax({
+	        			type : "get",
+	        			url : $.ace.getContextPath() + "/admin/weather/updateall/",
+	        			dataType : "json",
+	        			success : function(json) {
+	        				if(json.state=='success'){
+	        					noty({"text":""+ json.msg +"","layout":"top","type":"success","timeout":"2000"});
+	        					$.adminWeather.initSearchDataTable();
+	        				}else{
+	        					noty({"text":""+ json.resultMap.msg +"","layout":"top","type":"warning"});
+	        				}
+	        			}
+	        		});
+	            }
+	        });
+		},
 		deleteWeather :function(id){
 			bootbox.confirm( "是否确认删除？", function (result) {
 	            if(result){

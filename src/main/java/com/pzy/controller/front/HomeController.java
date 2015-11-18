@@ -48,7 +48,7 @@ public class HomeController {
 	private WeatherService weatherService;
 	@RequestMapping("index")
 	public String index() {
-		return "index";
+		return "weather";
 	}
 	/***
 	 * 关于
@@ -170,7 +170,7 @@ public class HomeController {
 			return "login";
 		}else{
 			httpSession.setAttribute("user", user);
-			return "index";
+			return "weather";
 		}
 	}
 	/***
@@ -182,7 +182,7 @@ public class HomeController {
 	@RequestMapping(value = "loginout",method = RequestMethod.GET)
 	public String loginout(HttpSession httpSession, Model model) {
 		httpSession.removeAttribute("user");
-		return "index";
+		return "weather";
 	}
 	
 	@ModelAttribute

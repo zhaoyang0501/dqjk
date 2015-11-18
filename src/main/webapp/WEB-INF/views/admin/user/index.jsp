@@ -56,7 +56,7 @@
 										<tr>
 											<th >ID</th>
 											<th >用户名</th>
-											<th >商户密码</th>
+											<th >密码</th>
 											<th >姓名</th>
 											<th >地址</th>
 											<th >电话</th>

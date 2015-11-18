@@ -48,7 +48,9 @@
 									class="btn btn-info" data-loading-text="正在加载..."><i class="icon-search"></i>查询</a>
 							</div>
 							<div class="widget-container">
-								<a class="btn btn-success" style="float: right; margin: 5px;" onclick="$.adminWeather.showaddModal()"><i class="icon-plus"></i> 新增</a>
+								<a class="btn btn-success" style="float: right; margin: 5px;" onclick="$.adminWeather.updateall()"><i class="icon-plus"></i> 新增</a>
+								
+								<a class="btn btn-success" style="float: right; margin: 5px;" onclick="$.adminWeather.showaddModal()"><i class="icon-plus"></i>自动同步当天数据</a>
 							
 								<table class="responsive table table-striped table-bordered"
 									id="dt_table_view">
