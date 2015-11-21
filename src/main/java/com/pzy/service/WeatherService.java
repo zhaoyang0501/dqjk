@@ -89,4 +89,10 @@ public class WeatherService {
 	public void save(Weather weather) {
 		weatherRepository.save(weather);
 	}
+	public void deleteall(Date	 date) {
+		weatherRepository.deleteWeather(date);
+	}
+	public List<Weather> findAll(Date date) {
+		return (List<Weather>) weatherRepository.findByNowDate(date);
+	}
 }

@@ -170,6 +170,7 @@ public class HomeController {
 			return "login";
 		}else{
 			httpSession.setAttribute("user", user);
+			model.addAttribute("citys", cityService.findAll());
 			return "weather";
 		}
 	}

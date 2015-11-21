@@ -32,22 +32,53 @@ public class NetUtil {
     public static void getPm25(List<Weather> list) throws JsonParseException, JsonMappingException, IOException{
     	 ObjectMapper mapper = new ObjectMapper();
     	for(Weather weather:list){
-    		String res=getpm(weather.getCity().getName());
+    		String res=getpm(weather.getCity().getCity());
     		JsonNode rootNode = mapper.readValue(res, JsonNode.class);  
-    	    JsonNode nameNode = rootNode.path("result");  
-    	    List<LinkedHashMap<String, Object>> listbean = mapper.readValue( nameNode.toString(), List.class);
-    	    weather.setAqi(Double.valueOf((String)listbean.get(0).get("AQI")));
-    	    weather.setPm25(Double.valueOf((String)listbean.get(0).get("PM2.5")));
+    	    try {
+				JsonNode nameNode = rootNode.path("result");
+				List<LinkedHashMap<String, Object>> listbean = mapper
+						.readValue(nameNode.toString(), List.class);
+				weather.setAqi(Double.valueOf((String) listbean.get(0).get(
+						"AQI")));
+				weather.setPm25(Double.valueOf((String) listbean.get(0).get(
+						"PM2.5")));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
     	}
     }
- 
+    public static void getWeather(List<Weather> list) throws JsonParseException, JsonMappingException, IOException{
+   	 ObjectMapper mapper = new ObjectMapper();
+	   	for(Weather weather:list){
+	   		String res=getweather(weather.getCity().getCity());
+	   		JsonNode rootNode = mapper.readValue(res, JsonNode.class);  
+	   	    Double max=0d;
+			Double min=0d;
+			Double sd=0d;
+			String weathertype="";
+			try {
+				max = rootNode.path("result").path("data").path("weather").get(0).path("info").path("day").get(2).asDouble();
+				min = rootNode.path("result").path("data").path("weather").get(0).path("info").path("night").get(2).asDouble();
+				sd = rootNode.path("result").path("data").path("realtime").path("weather").path("humidity").asDouble();
+				weathertype = rootNode.path("result").path("data").path("weather").get(0).path("info").path("day").get(1).asText();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        weather.setTemmax(max);
+	        weather.setTemmin(min);
+	        weather.setSd(sd);
+	        weather.setType(weathertype);
+	   	}
+   }
     //2.城市空气PM2.5指数
     public static String getpm(String city){
         String result =null;
         String url ="http://web.juhe.cn:8080/environment/air/pm";//请求接口地址
         Map<String, Object> params = new HashMap<String, Object>();//请求参数
-            params.put("city",city);//城市名称的中文名称或拼音，如：上海 或 shanghai
-            params.put("key","980e3b36ff0b873d8a0702e9eb6d91ec");//APP Key
+            params.put("city",city);//城市名称的中文名称或拼音，如：上海 或 shanghai980e3b36ff0b873d8a0702e9eb6d91ec
+            params.put("key","837fbdf8639dd25969197f03d6624774");//APP Key
+            
         try {
             result =net(url, params, "GET");
         } catch (Exception e) {
@@ -57,10 +88,11 @@ public class NetUtil {
     }
     public static String getweather(String city){
         String result =null;
-        String url ="http://web.juhe.cn:8080/environment/air/pm";//请求接口地址
+        String url ="http://op.juhe.cn/onebox/weather/query";//请求接口地址
         Map<String, Object> params = new HashMap<String, Object>();//请求参数
-            params.put("city",city);//城市名称的中文名称或拼音，如：上海 或 shanghai
-            params.put("key","980e3b36ff0b873d8a0702e9eb6d91ec");//APP Key
+            params.put("cityname",city);//城市名称的中文名称或拼音，如：上海 或 shanghai\
+            //85e697e9ed0a84097ee51617a00f78ea
+            params.put("key","0617ec103d55797a1cbb7581b956a970");//APP Key
         try {
             result =net(url, params, "GET");
         } catch (Exception e) {
@@ -71,21 +103,29 @@ public class NetUtil {
  
     
  
-   /* public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
-    	String res=getpm();
+    public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+    	String res=getweather("扬州");
     	System.out.println(res);
     	 ObjectMapper mapper = new ObjectMapper(); // can reuse, share globally  
          
          JsonNode rootNode = mapper.readValue(res, JsonNode.class);  
            
          //获得结点为rules的集合  
-         JsonNode nameNode = rootNode.path("result");  
-         List<LinkedHashMap<String, Object>> list = mapper.readValue( nameNode.toString(), List.class);
-        
-          Weather weather =new  Weather();
-          weather.setAqi(Double.valueOf((String)list.get(0).get("AQI")));
-          weather.setPm25(Double.valueOf((String)list.get(0).get("PM2.5")));
-    }*/
+         Double max = rootNode.path("result").path("data").path("weather").get(0).path("info").path("day").get(2).asDouble();
+         Double min = rootNode.path("result").path("data").path("weather").get(0).path("info").path("night").get(2).asDouble();
+         Double sd = rootNode.path("result").path("data").path("realtime").path("weather").path("humidity").asDouble();
+         
+         String weather = rootNode.path("result").path("data").path("weather").get(0).path("info").path("day").get(1).asText();
+         
+         JsonNode nameNode1 = rootNode.path("result").path("data").path("weather").get(0).path("info").path("day").get(2);
+         
+    /*     List<LinkedHashMap<String, Object>> list = mapper.readValue( nameNode.toString(), List.class);
+         JsonNode json=(JsonNode)list.get(0).get("info");
+         json.path("day").get(1).asText();
+          Weather weather =new  Weather();*/
+        /*  weather.setAqi(Double.valueOf((String)list.get(0).get("AQI")));
+          weather.setPm25(Double.valueOf((String)list.get(0).get("PM2.5")));*/
+    }
  
     /**
      *

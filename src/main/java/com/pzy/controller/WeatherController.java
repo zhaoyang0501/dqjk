@@ -1,6 +1,7 @@
 package com.pzy.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.pzy.entity.City;
 import com.pzy.entity.Weather;
 import com.pzy.service.CityService;
 import com.pzy.service.WeatherService;
@@ -103,10 +107,25 @@ public class WeatherController {
 	public Map<String, Object> updateall() {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
-			List<Weather> list=weatherService.findAll();
-			NetUtil.getPm25(list);
-			for(Weather bean:list){
-				weatherService.save(bean);
+			String nowdate= DateFormatUtils.format(new Date(System.currentTimeMillis()), "yyyy-MM-dd");
+			Date date=DateUtils.parseDate(nowdate, "yyyy-MM-dd");
+			List<Weather> list=weatherService.findAll(date);
+			for(Weather weather:list){
+				weatherService.delete(weather.getId());
+			}
+			List<Weather> newlist=new ArrayList<Weather>();
+			List<City> citys=cityService.findAll();
+			for( int i=0;i<10;i++){
+				Weather weather =new Weather();
+				weather.setCity(citys.get(i));
+				weather.setNowDate(date);
+				newlist.add(weather);
+			}
+			NetUtil.getPm25(newlist);
+			NetUtil.getWeather(newlist);
+			
+			for(Weather weather:newlist){
+				weatherService.save(weather);
 			}
 			map.put("state", "success");
 			map.put("msg", "接口中更新数据成功！！");
